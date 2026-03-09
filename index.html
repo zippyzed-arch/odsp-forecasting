@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SPO DAU Dashboard — Tenant Category Trends</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    header h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+
+    header p {
+      font-size: 0.82rem;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    .badge {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 0.75rem;
+      color: #94a3b8;
+      white-space: nowrap;
+    }
+
+    /* KPI cards */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 16px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--accent);
+    }
+
+    .kpi-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #64748b;
+      margin-bottom: 6px;
+    }
+
+    .kpi-value {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      line-height: 1;
+    }
+
+    .kpi-sub {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+
+    .kpi-growth {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 99px;
+    }
+
+    .kpi-growth.up   { background: #14532d44; color: #4ade80; }
+    .kpi-growth.flat { background: #1e3a5f44; color: #60a5fa; }
+
+    /* Charts layout */
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 860px) {
+      .chart-grid { grid-template-columns: 1fr; }
+    }
+
+    .chart-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .chart-card.wide {
+      grid-column: 1 / -1;
+    }
+
+    .chart-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      margin-bottom: 4px;
+    }
+
+    .chart-subtitle {
+      font-size: 0.74rem;
+      color: #475569;
+      margin-bottom: 16px;
+    }
+
+    canvas { width: 100% !important; }
+
+    /* Insights */
+    .insights-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .insight-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 16px 20px;
+      border-left: 4px solid var(--accent);
+    }
+
+    .insight-icon { font-size: 1.1rem; margin-bottom: 6px; }
+
+    .insight-title {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #e2e8f0;
+      margin-bottom: 4px;
+    }
+
+    .insight-body {
+      font-size: 0.78rem;
+      color: #94a3b8;
+      line-height: 1.55;
+    }
+
+    .insight-body strong { color: #cbd5e1; }
+
+    footer {
+      text-align: center;
+      font-size: 0.72rem;
+      color: #334155;
+      padding-top: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>SPO DAU — Tenant Category Trends</h1>
+    <p>SharePoint Online · Worldwide · All Apps · Daily Active Users</p>
+  </div>
+  <div class="badge">Jan 2025 – Mar 2026</div>
+</header>
+
+<!-- KPI Cards -->
+<div class="kpi-grid">
+  <div class="kpi-card" style="--accent:#6366f1">
+    <div class="kpi-label">Commercial</div>
+    <div class="kpi-value">160.4M</div>
+    <div class="kpi-sub">Mar 4, 2026</div>
+    <span class="kpi-growth up">+28% vs Jan 2025</span>
+  </div>
+  <div class="kpi-card" style="--accent:#22d3ee">
+    <div class="kpi-label">Enterprise Commercial</div>
+    <div class="kpi-value">70.3M</div>
+    <div class="kpi-sub">Mar 4, 2026</div>
+    <span class="kpi-growth up">+24% vs Jan 2025</span>
+  </div>
+  <div class="kpi-card" style="--accent:#f59e0b">
+    <div class="kpi-label">SME&C Commercial</div>
+    <div class="kpi-value">66.1M</div>
+    <div class="kpi-sub">Mar 4, 2026</div>
+    <span class="kpi-growth flat">Data from Jul 2025</span>
+  </div>
+  <div class="kpi-card" style="--accent:#34d399">
+    <div class="kpi-label">Education</div>
+    <div class="kpi-value">37.1M</div>
+    <div class="kpi-sub">Mar 4, 2026</div>
+    <span class="kpi-growth up">+37% vs Jan 2025</span>
+  </div>
+  <div class="kpi-card" style="--accent:#f87171">
+    <div class="kpi-label">Enterprise Public Sector</div>
+    <div class="kpi-value">35.3M</div>
+    <div class="kpi-sub">Mar 4, 2026</div>
+    <span class="kpi-growth up">+10% vs Jan 2025</span>
+  </div>
+  <div class="kpi-card" style="--accent:#a78bfa">
+    <div class="kpi-label">SME&C Public Sector</div>
+    <div class="kpi-value">25.3M</div>
+    <div class="kpi-sub">Mar 4, 2026</div>
+    <span class="kpi-growth up">+84% since Jul 2025</span>
+  </div>
+</div>
+
+<!-- Charts -->
+<div class="chart-grid">
+
+  <div class="chart-card wide">
+    <div class="chart-title">Monthly Average DAU by Tenant Category</div>
+    <div class="chart-subtitle">Jan 2025 – Mar 2026 · millions</div>
+    <canvas id="trendChart" height="100"></canvas>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">Current DAU Share (Mar 2026)</div>
+    <div class="chart-subtitle">Proportion of total DAU per category</div>
+    <canvas id="donutChart" height="220"></canvas>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">YoY Growth Rate</div>
+    <div class="chart-subtitle">Jan 2025 baseline vs Mar 2026 (available segments)</div>
+    <canvas id="growthChart" height="220"></canvas>
+  </div>
+
+</div>
+
+<!-- Insights -->
+<div class="insights-grid">
+  <div class="insight-card" style="--accent:#34d399">
+    <div class="insight-icon">📈</div>
+    <div class="insight-title">Edu Leads Growth (+37%)</div>
+    <div class="insight-body">
+      Education grew fastest overall — from <strong>23.7M → 37.1M DAU</strong> — despite a sharp summer trough. Strong back-to-school rebounds in Sep–Oct each year drive recovery.
+    </div>
+  </div>
+  <div class="insight-card" style="--accent:#f87171">
+    <div class="insight-icon">☀️</div>
+    <div class="insight-title">Summer Seasonality Is Universal</div>
+    <div class="insight-body">
+      Every segment dips Jul–Aug. <strong>Enterprise Public Sector</strong> drops most severely (−43% from peak to Aug trough). <strong>Edu</strong> also halves in summer. Commercial is most resilient.
+    </div>
+  </div>
+  <div class="insight-card" style="--accent:#a78bfa">
+    <div class="insight-icon">🔀</div>
+    <div class="insight-title">SME&C Reclassification (Jul 2025)</div>
+    <div class="insight-body">
+      SME&C Commercial and Public Sector segments appear from July 2025, absorbing the former "Small, Medium & Corporate" categories. <strong>SME&C Public Sector</strong> nearly doubled since Jul 2025.
+    </div>
+  </div>
+  <div class="insight-card" style="--accent:#6366f1">
+    <div class="insight-icon">🏆</div>
+    <div class="insight-title">Commercial Dominates at 40% Share</div>
+    <div class="insight-body">
+      Commercial holds <strong>40% of total DAU</strong> as of Mar 2026. Enterprise Commercial and SME&C Commercial together add another 34%, making commercial segments ~74% of usage.
+    </div>
+  </div>
+  <div class="insight-card" style="--accent:#22d3ee">
+    <div class="insight-icon">🚀</div>
+    <div class="insight-title">Mar 2026 is a Record Month</div>
+    <div class="insight-body">
+      March 2026 shows the highest DAU for <strong>all segments</strong> — Commercial at 133.9M avg, Enterprise Commercial at 59.0M, and Edu at 32.6M are all all-time highs in this dataset.
+    </div>
+  </div>
+  <div class="insight-card" style="--accent:#f59e0b">
+    <div class="insight-icon">📉</div>
+    <div class="insight-title">Public Sector Lags Commercial Growth</div>
+    <div class="insight-body">
+      Enterprise Public Sector grew only <strong>+10%</strong> vs Commercial's +28%. Holiday and fiscal-year sensitivity — Dec and Aug troughs are steeper — may reflect procurement cycles.
+    </div>
+  </div>
+</div>
+
+<footer>Source: user-cap-forecast · SPODauSegmentedByApp · Generated 2026-03-09</footer>
+
+<script>
+const months = [
+  '2025-01','2025-02','2025-03','2025-04','2025-05','2025-06',
+  '2025-07','2025-08','2025-09','2025-10','2025-11','2025-12',
+  '2026-01','2026-02','2026-03'
+];
+
+const data = {
+  'Commercial':              [104464383,110243819,110730718,118696346,123043192,126334102,117223448,104285737,118738387,119799598,113364252,109237513,115687693,126654980,133940182],
+  'Enterprise Commercial':   [47534486, 50041136, 50002499, 52692496, 53609970, 55372489, 53629169, 48025135, 53692508, 54263836, 51531351, 49854122, 51836386, 56100346, 58950294],
+  'Enterprise Public Sector':[27288933, 30367165, 31140984, 32071805, 33894632, 30892357, 22553563, 19286258, 25229491, 26431744, 24933844, 21297065, 23139769, 27048756, 30112768],
+  'Edu':                     [23729065, 26977095, 27815371, 28316601, 30196108, 25433364, 15709877, 16956609, 27125916, 29031454, 28798868, 21956015, 24234948, 28469684, 32550656],
+  'SME&C Commercial':        [null,null,null,null,null,null,56012332,41881711,47347859,48352051,46214772,44755732,47666909,52266551,55158194],
+  'SME&C Public Sector':     [null,null,null,null,null,null,11862040,11863995,18961563,19521577,19201530,15044767,16995400,19402662,21911587],
+};
+
+const palette = {
+  'Commercial':               '#6366f1',
+  'Enterprise Commercial':    '#22d3ee',
+  'SME&C Commercial':         '#f59e0b',
+  'Edu':                      '#34d399',
+  'Enterprise Public Sector': '#f87171',
+  'SME&C Public Sector':      '#a78bfa',
+};
+
+const toM = v => v == null ? null : +(v / 1e6).toFixed(2);
+
+// ── Trend line chart ──────────────────────────────────────────────────────────
+const trendCtx = document.getElementById('trendChart').getContext('2d');
+new Chart(trendCtx, {
+  type: 'line',
+  data: {
+    labels: months,
+    datasets: Object.entries(data).map(([cat, vals]) => ({
+      label: cat,
+      data: vals.map(toM),
+      borderColor: palette[cat],
+      backgroundColor: palette[cat] + '18',
+      borderWidth: 2.5,
+      pointRadius: 3,
+      pointHoverRadius: 6,
+      tension: 0.35,
+      spanGaps: true,
+    }))
+  },
+  options: {
+    responsive: true,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: { color: '#94a3b8', boxWidth: 12, padding: 16, font: { size: 11 } }
+      },
+      tooltip: {
+        backgroundColor: '#0f172a',
+        borderColor: '#334155',
+        borderWidth: 1,
+        titleColor: '#f1f5f9',
+        bodyColor: '#94a3b8',
+        callbacks: {
+          label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y != null ? ctx.parsed.y.toFixed(1) + 'M' : '—'}`
+        }
+      }
+    },
+    scales: {
+      x: { ticks: { color: '#475569', font: { size: 10 } }, grid: { color: '#1e293b' } },
+      y: {
+        ticks: { color: '#475569', font: { size: 10 }, callback: v => v + 'M' },
+        grid: { color: '#1e293b55' }
+      }
+    }
+  }
+});
+
+// ── Donut ─────────────────────────────────────────────────────────────────────
+const latestIdx = 14; // March 2026
+const donutCtx = document.getElementById('donutChart').getContext('2d');
+const cats = Object.keys(data);
+new Chart(donutCtx, {
+  type: 'doughnut',
+  data: {
+    labels: cats,
+    datasets: [{
+      data: cats.map(c => data[c][latestIdx] ?? 0),
+      backgroundColor: cats.map(c => palette[c]),
+      borderColor: '#0f1117',
+      borderWidth: 3,
+      hoverOffset: 8,
+    }]
+  },
+  options: {
+    responsive: true,
+    cutout: '62%',
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: { color: '#94a3b8', boxWidth: 10, padding: 10, font: { size: 10 } }
+      },
+      tooltip: {
+        backgroundColor: '#0f172a',
+        borderColor: '#334155',
+        borderWidth: 1,
+        callbacks: {
+          label: ctx => ` ${ctx.label}: ${(ctx.raw / 1e6).toFixed(1)}M`
+        }
+      }
+    }
+  }
+});
+
+// ── Growth bar chart ──────────────────────────────────────────────────────────
+const growthCats   = ['Commercial','Enterprise Commercial','Enterprise Public Sector','Edu'];
+const growthValues = [28, 24, 10, 37];
+
+const growthCtx = document.getElementById('growthChart').getContext('2d');
+new Chart(growthCtx, {
+  type: 'bar',
+  data: {
+    labels: growthCats,
+    datasets: [{
+      label: 'Growth %',
+      data: growthValues,
+      backgroundColor: growthCats.map(c => palette[c] + 'cc'),
+      borderColor:     growthCats.map(c => palette[c]),
+      borderWidth: 1.5,
+      borderRadius: 6,
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#0f172a',
+        borderColor: '#334155',
+        borderWidth: 1,
+        callbacks: { label: ctx => ` +${ctx.raw}%` }
+      }
+    },
+    scales: {
+      x: {
+        ticks: { color: '#475569', callback: v => v + '%', font: { size: 10 } },
+        grid: { color: '#1e293b55' }
+      },
+      y: { ticks: { color: '#94a3b8', font: { size: 11 } }, grid: { display: false } }
+    }
+  }
+});
+</script>
+</body>
+</html>
